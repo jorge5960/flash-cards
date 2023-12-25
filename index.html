@@ -78,7 +78,7 @@
       top: 0;
       left: 0;
       background-color: #fff;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .14)
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     }
 
     .front {
@@ -109,14 +109,13 @@
     .front,
     .back {
       width: 100%;
-      height: 420px;
+      height: 480px;
       border-radius: 4px
     }
 
     .card .cover {
-      height: 105px;
-      overflow: hidden;
-      border-radius: 4px 4px 0 0
+      padding: 15px 20px;
+      height: 60px;
     }
 
     .card .cover img,
@@ -147,11 +146,16 @@
     }
 
     .card .content .main {
-      min-height: 160px
+      min-height: 350px;
+      display: flex;
+      align-items: center;
     }
 
+
     .card .back .content .main {
-      height: 215px
+      height: 300px;
+      overflow-y: auto;
+      min-height: 300px;
     }
 
     .card .name {
@@ -196,7 +200,7 @@
 
     .card .header {
       padding: 15px 20px;
-      height: 90px
+      height: 60px;
     }
 
     .card .motto {
@@ -403,9 +407,9 @@
     }
 
     body {
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background: linear-gradient(-45deg, #e8d6b2, #f4f3f2, #aa9567, #452c01);
       background-size: 400% 400%;
-      animation: gradient 15s ease infinite;
+      animation: gradient 75s ease infinite;
       height: 100vh;
     }
 
@@ -512,9 +516,16 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     }
 
-    .hiddenCount {
+    #section-title{
       position: absolute;
       left: 10px;
+      color:#fff;
+    }
+    .hiddenCount {
+      border-left: 1px solid #000;
+      padding-left: 1rem;
+      border-right: 1px solid #000;
+      padding-right: 1rem;
     }
 
     #count {
@@ -531,81 +542,131 @@
   <div>
     <div class="title-panel"><span id="title"></span></div>
     <div id="categories-container" class="topnav"></div>
-    <div class="subtitle-panel"><span class="hiddenCount">Hidden: <div id="count"></div></span><span class="showAll"
-        onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save"
-          aria-hidden="true"></i> Save</span><span class="import" onclick="openFile()"><i class="fa fa-file-import"></i>
-        Import<input id="inp" type='file' style="visibility:hidden;width: 0;height: 0;"
-          onchange="readFile(event)" /></span></div>
+    <div class="subtitle-panel">
+      <span id="section-title"></span>
+      <span class="hiddenCount">Hidden: <div id="count"></div></span>
+      <span class="showAll" onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save"
+          aria-hidden="true"></i> Save</span>
+      <span class="import" onclick="openFile()"><i class="fa fa-file-import"></i>Import<input id="inp" type='file' style="visibility:hidden;width: 0;height: 0;"
+          onchange="readFile(event)" /></span>
+    </div>
     <div id="cards-container" class="col-card-container"></div>
   </div>
   <script>
 
     /**
      * 
-     *     PREGUNTAS
+     *     QUESTIONS
      * 
      */
     let data = {
-      title: 'beatriz',
+      title: 'Lecture 27: Endocrine System III',
       categories: [
         {
           name: 'Section A',
+          title: 'Titulo de la seccion',
           id: 'secA',
           cards: [
             {
               id: 'secA1',
     
-              question: 'Where has you been?',
-              answer: 'Chicago'
+              question: '(a) What are the three primary chemical classes of hormones? (b) Which of them are water-soluble, and which are lipid-soluble?',
+              answer: '(a) Steroids, peptides, and monoamines. (b) peptides and monoamines are water-soluble (except for TH), steroids hormones are lipid-soluble.'
             },
             {
-              id: 'CAT_A_2',
+              id: 'secA2',
           
-              question: 'HOLA?',
-              answer: 'HELLO'
+              question: '(a) From which two main sources in the body do steroid hormones originate? (b) What lipid serves as the precursor for steroid hormones? (c) Considering their hydrophobic nature, how are they transported through the predominantly water-based bloodstream?',
+              answer: '(a) Adrenal cortex and gonads (also they kidneys produce calcitriol).(b) Cholesterol. (c) Bound to carrier proteins.'
             },
             {
-              id: 'CAT_A_3',
+              id: 'secA3',
            
-              question: 'ASDFSADFASDF?',
-              answer: 'DSFDSF'
+              question: 'What is the role of carrier proteins in hormone transport through the blood?',
+              answer: 'Since lipophilic hormones do not mix well with water, they would have difficulty moving through the watery blood to reach their target tissues and organs. Carrier proteins are like molecular shuttles that bind to the lipophilic hormones, creating a complex that is soluble in water.'
             },
             {
-              id: 'CAT_A_4',
+              id: 'secA4',
               
-              question: 'ASDFSADFASDF?',
-              answer: 'DSFDSF'
+              question: '(a) Where are the receptors for steroid hormones located? (b) do these hormones require transport proteins in the plasma membrane for cellular entry? (c) Upon binding to their receptors, what are the overall cellular effects of steroid hormones?',
+              answer: '(a) In the cytosol or nucleus of the cell (inside the cell). (b) No, they can diffuse through it (lipid composition). (c) Genomic effects: activate/inactivate gene transcription (which implicates hours to days to show up the effects)'
             }
           ]
         },
         {
-          name: 'categoria B',
-          id: 'CAT_B',
+          name: 'Section B',
+          id: 'secB',
           cards: [
             {
-              id: 'CAT_B_1',
-              tmstamp: '',
-              question: 'Where has you been?',
-              answer: 'Chicago'
+              id: 'secB1',
+             
+              question: 'What are the three types of stimuli that regulate the production and secretion of hormones?',
+              answer: 'Humoral, neural, and hormonal'
             },
             {
-              id: 'CAT_B_2',
-              tmstamp: '',
-              question: 'dasdsWhere has you been?',
-              answer: 'Chicadsadgo'
-            }
+              id: 'secB2',
+             
+              question: 'If a hormone is released in response to altered levels of certain critical ions or nutrients in the blood, what kind of stimuli does this represent?',
+              answer: 'Humoral'
+            },
+            {
+              id: 'secB3',
+             
+              question: 'When low levels of calcium in the blood trigger the release of PTH, which type of stimuli is involved: humoral, neural, or hormonal?',
+              answer: 'Humoral'
+            },
+            {
+              id: 'secB4',
+             
+              question: 'In the scenario where action potentials in preganglionic sympathetic fibers to the adrenal medulla lead to the secretion of EPI/NOREPI, which type of stimuli is this: humoral, neural, or hormonal?',
+              answer: 'Neural'
+            },
+            {
+              id: 'secB5',
+             
+              question: 'In the case of hormones from the hypothalamus stimulating the anterior pituitary gland to release hormones that, in turn, stimulate other endocrine glands, what type of stimuli is involved: humoral, neural, or hormonal?',
+              answer: 'Hormonal'
+            },
           ]
         },
         {
-          name: 'categoria C',
-          id: 'CAT_C',
+          name: 'Section C',
+          id: 'secC',
           cards: [
             {
-              id: 'CAT_C_1',
-              tmstamp: '',
-              question: 'Where has yoASFDASDAu been?',
-              answer: 'Chicago'
-            }
+              id: 'secC1',
+             
+              question: 'What is meant by hormone-receptor specificity?',
+              answer: 'It refers to the selective interaction between a hormone and its specific receptor. Each hormone has a specific molecular structure that allows it to bind to a particular type of receptor, like a key fitting into a lock. This ensures that each hormone influences only cells equipped with the appropriate receptors'
+            },
+            {
+              id: 'secC2',
+              
+              question: 'What is meant by saturation in the contex of hormone-receptor?',
+              answer: 'Saturation occurs when the available receptors in a cell are already bound to hormones. Once saturation is reached, further increases in hormone concentration may not lead to a proportional increase in cellular response.'
+            },
+            {
+              id: 'secC3',
+              
+              question: 'What does hormone clearance refer to?',
+              answer: 'It refers to the removal or elimination of hormones from the bloodstream, effectively reducing their concentration.'
+            },
+          ]
+        },
+        {
+          name: 'Section D',
+          id: 'secD',
+          cards: [
+            {
+              id: 'secD1',
+              question: 'What are the four types of cell signaling or cell communication mechanisms discussed in class?',
+              answer: 'Paracrine, autocrine, endocrine, and direct signaling.'
+            },
+            {
+              id: 'secD2',
+              question: 'How does paracrine signaling differ from endocrine signaling, and how does each compare to autocrine signaling?',
+              answer: 'In paracrine signaling, cells release signaling molecules into the extracellular fluid, and these molecules act on nearby target cells. Endocrine signaling involves the release of hormones into the bloodstream to reach the target cells. Autocrine signaling occurs when a cell releases signaling molecules that bind to receptors on its own surface, influencing its own behavior'
+            },
           ]
         }
       ]
@@ -617,6 +678,7 @@
     const cardsContainer = document.getElementById("cards-container");
     const categoriesContainer = document.getElementById("categories-container");
     const titleElement = document.getElementById("title");
+    const sectionTitleElement = document.getElementById("section-title");
     const hiddenCountElement = document.getElementById("count");
     let currentCategory;
 
@@ -701,6 +763,7 @@
       currentCategory = idCategory;
       let category = categoriesData.filter((category) => category.id == idCategory)[0];
       hiddenCountElement.innerHTML = category.hiddenCount ? category.hiddenCount : 0;
+      sectionTitleElement.innerHTML = category.title;
       category.cards.forEach((card) => {
         createCard(card, idCategory)
       });
@@ -741,7 +804,7 @@
 
     }
 
-    function toggleHiden(idCard, idCategory) {
+    function toggleHide(idCard, idCategory) {
 
       let card = findCard(idCard);
       element = document.getElementById(idCard);
@@ -803,7 +866,7 @@
                          <h4 class="text-center">${card.answer}</h4>
                     </div>
                     <div class="footer">
-                        <button class="btn" onclick="toggleHiden('${card.id}', '${idCategory}')"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>
+                        <button class="btn" onclick="toggleHide('${card.id}', '${idCategory}')"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>
                         <button class="btn" onclick="tagCard('${card.id}')"><i class="fa fa-tag fa-lg" aria-hidden="true"></i></button>
                     </div>
                 </div>
