@@ -533,6 +533,17 @@
       color: #fff;
       font-weight: bold;
     }
+
+    .copyright {
+      margin-top:3rem;
+      width: 100%;
+      padding:2rem;
+      text-align: center;
+      display:block;
+      color:#9D9795;
+      border-top: 1px solid #8e6f3e;
+    }
+
   </style>
   <title>Flash Cards</title>
 
@@ -551,6 +562,7 @@
           onchange="readFile(event)" /></span>
     </div>
     <div id="cards-container" class="col-card-container"></div>
+    <span class="copyright">TEXTO PARA COPYRIGHT</span>
   </div>
   <script>
 
@@ -570,7 +582,7 @@
             {
               id: 'secA1',
     
-              question: '(a) What are the three primary chemical classes of hormones? (b) Which of them are water-soluble, and which are lipid-soluble?',
+              question: '<p>(a) What are the three primary chemical classes of hormones?</p> <p>(b) Which of them are water-soluble, and which are lipid-soluble?</p>',
               answer: '(a) Steroids, peptides, and monoamines. (b) peptides and monoamines are water-soluble (except for TH), steroids hormones are lipid-soluble.'
             },
             {
