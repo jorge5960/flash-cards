@@ -418,3 +418,12 @@ body {
   margin-top: -4rem;
   background: #f0f0f0;
 }
+.tag {
+  border: 5px dotted green;
+}
+.hideCard{
+  display: none;
+}
+.showAll{
+  cursor: pointer;
+}

@@ -57,22 +57,23 @@ let data = {
         }
     ]
 }
+
 /***
  *  DOM
  */
 const cardsContainer = document.getElementById("cards-container");
 const categoriesContainer = document.getElementById("categories-container");
 const titleElement = document.getElementById("title");
+const hiddenCountElement = document.getElementById("count");
+let currentCategory;
 
 // Store card data
 const categoriesData = getCategoriesData();
-
-const categoriesElements = [];
 /**
  *  TITLE
  */
 
-function createTitle(){
+function createTitle() {
     titleElement.innerHTML = data.title;
 }
 createTitle();
@@ -80,16 +81,19 @@ createTitle();
 /**
  *  CATEGORIES
  */
-function activateCategory(id){
+function activateCategory(idCategory) {
+
     cardsContainer.innerHTML = '';
-    Array.from(categoriesContainer.children).forEach((element)=>{
-        if(element.id == id){
+    Array.from(categoriesContainer.children).forEach((element) => {
+        if (element.id == idCategory) {
             element.classList.add('active');
-        }else{
+        } else {
             element.classList.remove('active');
         }
     });
-    createCards(id);
+    createCards(idCategory);
+    let category = categoriesData.filter((category) => category.id == idCategory)[0];
+    hiddenCountElement.innerHTML = category.hiddenCount? category.hiddenCount:0;
 }
 
 function createCategories() {
@@ -105,7 +109,7 @@ function getCategoriesData() {
 function createCategory(data, index) {
 
     const category = document.createElement("span");
-    category.id= data.id;
+    category.id = data.id;
     category.innerHTML = `${data.name}`;
     if (index === 0) {
         category.classList.add("active");
@@ -119,47 +123,125 @@ createCategories();
 /***
  *  CARDS
  */
+function showAll(){
+    categoriesData.filter((category) => category.id == currentCategory)[0].cards.forEach((data) => showCard(data,currentCategory));
+}
 
 function createCards(idCategory) {
-    categoriesData.filter((category)=> category.id == idCategory)[0].cards.forEach((data, index) => createCard(data));
+    currentCategory = idCategory;
+    let category = categoriesData.filter((category) => category.id == idCategory)[0];
+    category.cards.forEach((card) => {
+        createCard(card,idCategory)       
+    });
+}
+
+function findCard(idCard) {
+    let finded = undefined;
+    categoriesData.forEach((category) => {
+        category.cards.forEach((card) => {
+            if (card.id == idCard) {
+                finded = card;
+            }
+        })
+    })
+    return finded;
+}
+
+function tagCard(idCard) {
+    let card = findCard(idCard);
+    element = document.getElementById(idCard);
+    let elementsCard = element.getElementsByClassName('front');
+    Array.from(elementsCard).forEach((backFrontElement) => {
+        if (card.tagged) {
+            backFrontElement.classList.remove('tag');
+        } else {
+            backFrontElement.classList.add('tag');
+        }
+    });
+    elementsCard = element.getElementsByClassName('back');
+    Array.from(elementsCard).forEach((backFrontElement) => {
+        if (card.tagged) {
+            backFrontElement.classList.remove('tag');
+        } else {
+            backFrontElement.classList.add('tag');
+        }
+    });
+    card.tagged = !card.tagged;
+
+}
+
+function toggleHiden(idCard, idCategory){
+
+    let card = findCard(idCard);
+    element = document.getElementById(idCard);
+    if (card.hidden) {
+        element.classList.remove('hideCard');
+    } else {
+        element.classList.add('hideCard');
+    }
+    card.hidden = !card.hidden;
+    let category = categoriesData.filter((category) => category.id == idCategory)[0];
+    if(category.hiddenCount){
+        category.hiddenCount++;
+    }else{
+        category.hiddenCount = 1;
+    }
+    hiddenCountElement.innerHTML = category.hiddenCount;
+
+}
+
+function showCard(card, idCategory){
+
+    element = document.getElementById(card.id);
+    element.classList.remove('hideCard');
+    card.hidden = false;
+    let category = categoriesData.filter((category) => category.id == idCategory)[0];
+    category.hiddenCount = 0;
+    hiddenCountElement.innerHTML = category.hiddenCount;
+
 }
 
 // Create a single card in DOM
-function createCard(data) {
-    const card = document.createElement("div");
-    card.classList.add("card-container");
-    card.classList.add("col-card");
-    card.innerHTML = `
+function createCard(card, idCategory) {
+    let _tagClass = card.tagged? 'tag':'';
+    const cardElement = document.createElement("div");
+    cardElement.id = card.id;
+    cardElement.classList.add("card-container");
+    cardElement.classList.add("col-card");
+    if(card.hidden){
+        cardElement.classList.add("hideCard");
+    }
+    cardElement.innerHTML = `
         <div class="card">
-            <div class="front">
+            <div class="front ${_tagClass}">
                 <div class="cover">
                    <img src="https://www.purdue.edu/home/wp-content/themes/purdue-home-theme/imgs/PU-H-light.svg">
                 </div>
                 <div class="content">
                     <div class="main">
-                        <h3 class="name">${data.question}</h3>
+                        <h3 class="name">${card.question}</h3>
                     </div>
                     <div class="footer">
                     </div>
                 </div>
             </div> 
-            <div class="back">
+            <div class="back  ${_tagClass}">
                 <div class="header">
                     <img src="https://www.purdue.edu/home/wp-content/themes/purdue-home-theme/imgs/PU-H-light.svg">
                 </div>
                 <div class="content">
                     <div class="main">
-                         <h4 class="text-center">${data.answer}</h4>
+                         <h4 class="text-center">${card.answer}</h4>
                     </div>
                     <div class="footer">
-                        <button class="btn" id="green"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>
-                        <button class="btn" id="red"><i class="fa fa-thumbs-down fa-lg" aria-hidden="true"></i></button>
+                        <button class="btn" onclick="toggleHiden('${card.id}', '${idCategory}')"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>
+                        <button class="btn" onclick="tagCard('${card.id}')"><i class="fa fa-tag fa-lg" aria-hidden="true"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    cardsContainer.appendChild(card);
+    cardsContainer.appendChild(cardElement);
 }
 
 createCards(categoriesData[0].id);
