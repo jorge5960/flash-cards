@@ -99,6 +99,22 @@ function createCategories() {
 }
 
 function getCategoriesData() {
+    let _random = data.categories.filter(element => element.id == 'RANDOM');
+    if(_random.length == 0){
+        let _allCards = [];
+        data.categories.forEach((category)=>{
+            category.cards.forEach((card) => {
+                _allCards.push({...card, id: 'RANDOM_'+card.id});
+            });
+        });
+        data.categories.push({
+            name: 'RANDOM',
+            id: 'RANDOM',
+            cards:  _allCards.map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value)
+        });
+    }
     return data.categories;
 }
 
@@ -107,7 +123,11 @@ function createCategory(data, index) {
 
     const category = document.createElement("span");
     category.id = data.id;
-    category.innerHTML = `${data.name}`;
+    if(data.id != 'RANDOM'){
+        category.innerHTML = `${data.name}`;
+    }else{
+        category.innerHTML  = '<i class="fa fa-random"></i>';
+    }
     if (index === 0) {
         category.classList.add("active");
     }
