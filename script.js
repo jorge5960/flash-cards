@@ -92,8 +92,6 @@ function activateCategory(idCategory) {
         }
     });
     createCards(idCategory);
-    let category = categoriesData.filter((category) => category.id == idCategory)[0];
-    hiddenCountElement.innerHTML = category.hiddenCount? category.hiddenCount:0;
 }
 
 function createCategories() {
@@ -129,6 +127,7 @@ function showAll(){
 function createCards(idCategory) {
     currentCategory = idCategory;
     let category = categoriesData.filter((category) => category.id == idCategory)[0];
+    hiddenCountElement.innerHTML = category.hiddenCount? category.hiddenCount:0;
     category.cards.forEach((card) => {
         createCard(card,idCategory)       
     });
@@ -219,8 +218,6 @@ function createCard(card, idCategory) {
                 <div class="content">
                     <div class="main">
                         <h3 class="name">${card.question}</h3>
-                    </div>
-                    <div class="footer">
                     </div>
                 </div>
             </div> 

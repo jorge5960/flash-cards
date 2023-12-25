@@ -20,8 +20,8 @@
   <body>
     <div>
         <div class="title-panel"><span id="title"></span></div>
-        <div class="subtitle-panel"><span class="hiddenCount">Hidden: </span><span id="count"></span><span class="showAll" onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save" aria-hidden="true"></i> Save</span><span class="import" onclick="openFile()"><i class="fa fa-file-import"></i> Import<input id="inp" type='file' style="visibility:hidden;" onchange="readFile(event)" /></span></div>
         <div id="categories-container" class="topnav"></div>
+        <div class="subtitle-panel"><span class="hiddenCount">Hidden: <div id="count"></div></span><span class="showAll" onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save" aria-hidden="true"></i> Save</span><span class="import" onclick="openFile()"><i class="fa fa-file-import"></i> Import<input id="inp" type='file' style="visibility:hidden;width: 0;height: 0;" onchange="readFile(event)"/></span></div>
         <div id="cards-container" class="col-card-container"></div>
     </div>
      <script src="script.js"></script>
