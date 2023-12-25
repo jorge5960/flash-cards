@@ -1,29 +1,861 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
-      integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ="
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <title>Flash Cards</title>
-  </head>
-  <body>
-    <div>
-        <div class="title-panel"><span id="title"></span></div>
-        <div id="categories-container" class="topnav"></div>
-        <div class="subtitle-panel"><span class="hiddenCount">Hidden: <div id="count"></div></span><span class="showAll" onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save" aria-hidden="true"></i> Save</span><span class="import" onclick="openFile()"><i class="fa fa-file-import"></i> Import<input id="inp" type='file' style="visibility:hidden;width: 0;height: 0;" onchange="readFile(event)"/></span></div>
-        <div id="cards-container" class="col-card-container"></div>
-    </div>
-     <script src="script.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
+    integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin-top: 60px;
+      font-size: 14px;
+      font-family: helvetica nueue, Arial, Verdana, sans-serif;
+      background-color: #e5e9ed
+    }
+
+    .btn:hover,
+    .btn:focus,
+    .btn:active {
+      outline: 0 !important
+    }
+
+    .card-container {
+      -webkit-perspective: 800px;
+      -moz-perspective: 800px;
+      -o-perspective: 800px;
+      perspective: 800px;
+      margin-bottom: 30px
+    }
+
+    .card-container:not(.manual-flip):hover .card,
+    .card-container.hover.manual-flip .card {
+      -webkit-transform: rotateY(180deg);
+      -moz-transform: rotateY(180deg);
+      -o-transform: rotateY(180deg);
+      transform: rotateY(180deg)
+    }
+
+    .card-container.static:hover .card,
+    .card-container.static.hover .card {
+      -webkit-transform: none;
+      -moz-transform: none;
+      -o-transform: none;
+      transform: none
+    }
+
+    .card {
+      -webkit-transition: -webkit-transform .5s;
+      -moz-transition: -moz-transform .5s;
+      -o-transition: -o-transform .5s;
+      transition: transform .5s;
+      -webkit-transform-style: preserve-3d;
+      -moz-transform-style: preserve-3d;
+      -o-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      position: relative
+    }
+
+    .front,
+    .back {
+      -webkit-backface-visibility: hidden;
+      -moz-backface-visibility: hidden;
+      -o-backface-visibility: hidden;
+      backface-visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #fff;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .14)
+    }
+
+    .front {
+      z-index: 2
+    }
+
+    .back {
+      -webkit-transform: rotateY(180deg);
+      -moz-transform: rotateY(180deg);
+      -o-transform: rotateY(180deg);
+      transform: rotateY(180deg);
+      z-index: 3
+    }
+
+    .back .btn-simple {
+      position: absolute;
+      left: 0;
+      bottom: 4px
+    }
+
+    .card {
+      background: none repeat scroll 0 0 #fff;
+      border-radius: 4px;
+      color: #444
+    }
+
+    .card-container,
+    .front,
+    .back {
+      width: 100%;
+      height: 420px;
+      border-radius: 4px
+    }
+
+    .card .cover {
+      height: 105px;
+      overflow: hidden;
+      border-radius: 4px 4px 0 0
+    }
+
+    .card .cover img,
+    .card .header img {
+      height: 26px;
+      margin: 10px;
+    }
+
+    .card .user {
+      border-radius: 50%;
+      display: block;
+      height: 120px;
+      margin: -55px auto 0;
+      overflow: hidden;
+      width: 120px
+    }
+
+    .card .user img {
+      background: none repeat scroll 0 0 #fff;
+      border: 4px solid #fff;
+      width: 100%
+    }
+
+    .card .content {
+      background-color: transparent;
+      box-shadow: none;
+      padding: 10px 20px 20px
+    }
+
+    .card .content .main {
+      min-height: 160px
+    }
+
+    .card .back .content .main {
+      height: 215px
+    }
+
+    .card .name {
+      font-size: 22px;
+      line-height: 28px;
+      margin: 10px 0 0;
+      text-align: center;
+      text-transform: capitalize
+    }
+
+    .card h5 {
+      margin: 5px 0;
+      font-weight: 400;
+      line-height: 20px
+    }
+
+    .card .profession {
+      color: #999;
+      text-align: center;
+      margin-bottom: 20px
+    }
+
+    .card .footer {
+      border-top: 1px solid #eee;
+      color: #999;
+      margin: 30px 0 0;
+      padding: 10px 0 0;
+      text-align: center
+    }
+
+    .card .footer .social-links {
+      font-size: 18px
+    }
+
+    .card .footer .social-links a {
+      margin: 0 7px
+    }
+
+    .card .footer .btn-simple {
+      margin-top: -6px
+    }
+
+    .card .header {
+      padding: 15px 20px;
+      height: 90px
+    }
+
+    .card .motto {
+      border-bottom: 1px solid #eee;
+      color: #999;
+      font-size: 14px;
+      font-weight: 400;
+      padding-bottom: 10px;
+      text-align: center
+    }
+
+    .card .stats-container {
+      width: 100%;
+      margin-top: 50px
+    }
+
+    .card .stats {
+      display: block;
+      float: left;
+      width: 33.333333%;
+      text-align: center
+    }
+
+    .card .stats:first-child {
+      border-right: 1px solid #eee
+    }
+
+    .card .stats:last-child {
+      border-left: 1px solid #eee
+    }
+
+    .card .stats h4 {
+      font-weight: 300;
+      margin-bottom: 5px
+    }
+
+    .card .stats p {
+      color: #777
+    }
+
+    .title {
+      color: #506a85;
+      text-align: center;
+      font-weight: 300;
+      font-size: 44px;
+      margin-bottom: 90px;
+      line-height: 90%
+    }
+
+    .title small {
+      font-size: 17px;
+      color: #999;
+      text-transform: uppercase;
+      margin: 0
+    }
+
+    .space-30 {
+      height: 30px;
+      display: block
+    }
+
+    .space-50 {
+      height: 50px;
+      display: block
+    }
+
+    .space-200 {
+      height: 200px;
+      display: block
+    }
+
+    .white-board {
+      background-color: #fff;
+      min-height: 200px;
+      padding: 60px 60px 20px
+    }
+
+    .ct-heart {
+      color: #f74933
+    }
+
+    pre.prettyprint {
+      background-color: #fff;
+      border: 1px solid #999;
+      margin-top: 20px;
+      padding: 20px;
+      text-align: left
+    }
+
+    .atv,
+    .str {
+      color: #05ae0e
+    }
+
+    .tag,
+    .pln,
+    .kwd {
+      color: #3472f7
+    }
+
+    .atn {
+      color: #2c93ff
+    }
+
+    .pln {
+      color: #333
+    }
+
+    .com {
+      color: #999
+    }
+
+    .btn-simple {
+      opacity: .8;
+      color: #666;
+      background-color: transparent
+    }
+
+    .btn-simple:hover,
+    .btn-simple:focus {
+      background-color: transparent;
+      box-shadow: none;
+      opacity: 1
+    }
+
+    .btn-simple i {
+      font-size: 16px
+    }
+
+    .navbar-brand-logo {
+      padding: 0
+    }
+
+    .navbar-brand-logo .logo {
+      border: 1px solid #333;
+      border-radius: 50%;
+      float: left;
+      overflow: hidden;
+      width: 60px
+    }
+
+    .navbar .navbar-brand-logo .brand {
+      color: #fff;
+      float: left;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 20px;
+      margin-left: 10px;
+      margin-top: 10px;
+      width: 60px
+    }
+
+    .navbar-default .navbar-brand-logo .brand {
+      color: #555
+    }
+
+    .back {
+      background-color: #EBD99F;
+    }
+
+    @media screen and (-ms-high-contrast:active),
+    (-ms-high-contrast:none) {
+
+      .front,
+      .back {
+        -ms-backface-visibility: visible;
+        backface-visibility: visible
+      }
+
+      .back {
+        visibility: hidden;
+        -ms-transition: all .2s cubic-bezier(.92, .01, .83, .67);
+      }
+
+      .front {
+        z-index: 4
+      }
+
+      .card-container:not(.manual-flip):hover .back,
+      .card-container.manual-flip.hover .back {
+        z-index: 5;
+        visibility: visible
+      }
+    }
+
+    /*jorge */
+
+    .col-card-container {
+      display: flex;
+      /* Make the container element behave like a table */
+      width: 100%;
+      /* Set full-width to expand the whole page */
+      flex-wrap: wrap;
+      justify-content: center;
+
+    }
+
+    .col-card {
+      flex: 1;
+      padding: 16px;
+      width: 400px;
+      min-width: 400px;
+      max-width: 400px;
+    }
+
+    body {
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .seccion {
+      margin: 1.5rem;
+      font-size: 2rem;
+      color: white;
+      width: 100%;
+      border-bottom: 2px solid #fff;
+      padding-bottom: 1rem;
+    }
+
+
+    .topnav {
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    .topnav span {
+      float: left;
+      color: #f2f2f2;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .topnav span:hover {
+      background-color: #ddd;
+      color: black;
+    }
+
+    .topnav span.active {
+      background-color: #cfb991;
+      color: white;
+    }
+
+    .title-panel {
+      height: 4rem;
+      margin-top: -4rem;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: left;
+      align-items: center;
+      padding-left: 1rem;
+      font-size: 2rem;
+      text-shadow: 1px 1px 2px #EBD99F;
+    }
+
+    .tag {
+      border: 5px dotted #ff6900;
+    }
+
+    .hideCard {
+      display: none;
+    }
+
+    .showAll {
+      cursor: pointer;
+    }
+
+    .subtitle-panel {
+      background: #cfb991;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 2px 0 rgba(142, 111, 62, .3);
+      justify-content: end;
+    }
+
+    .subtitle-panel span {
+      font-size: 1rem;
+      margin: 0.5rem;
+    }
+
+    .import,
+    .save,
+    .showAll {
+      border-radius: 1rem;
+      border: 2px solid #000;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+    }
+
+    .import:hover,
+    .save:hover,
+    .showAll:hover {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    .hiddenCount {
+      position: absolute;
+      left: 10px;
+    }
+
+    #count {
+      display: inline-block;
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
+  <title>Flash Cards</title>
+
+</head>
+
+<body>
+  <div>
+    <div class="title-panel"><span id="title"></span></div>
+    <div id="categories-container" class="topnav"></div>
+    <div class="subtitle-panel"><span class="hiddenCount">Hidden: <div id="count"></div></span><span class="showAll"
+        onclick="showAll()">Show all</span><span class="save" onclick="save()"><i class="fa fa-save"
+          aria-hidden="true"></i> Save</span><span class="import" onclick="openFile()"><i class="fa fa-file-import"></i>
+        Import<input id="inp" type='file' style="visibility:hidden;width: 0;height: 0;"
+          onchange="readFile(event)" /></span></div>
+    <div id="cards-container" class="col-card-container"></div>
+  </div>
+  <script>
+
+    /**
+     * 
+     *     PREGUNTAS
+     * 
+     */
+    let data = {
+      title: 'beatriz',
+      categories: [
+        {
+          name: 'Section A',
+          id: 'secA',
+          cards: [
+            {
+              id: 'secA1',
+    
+              question: 'Where has you been?',
+              answer: 'Chicago'
+            },
+            {
+              id: 'CAT_A_2',
+          
+              question: 'HOLA?',
+              answer: 'HELLO'
+            },
+            {
+              id: 'CAT_A_3',
+           
+              question: 'ASDFSADFASDF?',
+              answer: 'DSFDSF'
+            },
+            {
+              id: 'CAT_A_4',
+              
+              question: 'ASDFSADFASDF?',
+              answer: 'DSFDSF'
+            }
+          ]
+        },
+        {
+          name: 'categoria B',
+          id: 'CAT_B',
+          cards: [
+            {
+              id: 'CAT_B_1',
+              tmstamp: '',
+              question: 'Where has you been?',
+              answer: 'Chicago'
+            },
+            {
+              id: 'CAT_B_2',
+              tmstamp: '',
+              question: 'dasdsWhere has you been?',
+              answer: 'Chicadsadgo'
+            }
+          ]
+        },
+        {
+          name: 'categoria C',
+          id: 'CAT_C',
+          cards: [
+            {
+              id: 'CAT_C_1',
+              tmstamp: '',
+              question: 'Where has yoASFDASDAu been?',
+              answer: 'Chicago'
+            }
+          ]
+        }
+      ]
+    }
+
+    /***
+     *  DOM
+     */
+    const cardsContainer = document.getElementById("cards-container");
+    const categoriesContainer = document.getElementById("categories-container");
+    const titleElement = document.getElementById("title");
+    const hiddenCountElement = document.getElementById("count");
+    let currentCategory;
+
+    // Store card data
+    let categoriesData = getCategoriesData();
+    /**
+     *  TITLE
+     */
+
+    function createTitle() {
+      titleElement.innerHTML = data.title;
+    }
+    createTitle();
+
+    /**
+     *  CATEGORIES
+     */
+    function activateCategory(idCategory) {
+
+      cardsContainer.innerHTML = '';
+      Array.from(categoriesContainer.children).forEach((element) => {
+        if (element.id == idCategory) {
+          element.classList.add('active');
+        } else {
+          element.classList.remove('active');
+        }
+      });
+      createCards(idCategory);
+    }
+
+    function createCategories() {
+      categoriesData.forEach((data, index) => createCategory(data, index));
+    }
+
+    function getCategoriesData() {
+      let _random = data.categories.filter(element => element.id == 'RANDOM');
+      if (_random.length == 0) {
+        let _allCards = [];
+        data.categories.forEach((category) => {
+          category.cards.forEach((card) => {
+            _allCards.push({ ...card, id: 'RANDOM_' + card.id });
+          });
+        });
+        data.categories.push({
+          name: 'RANDOM',
+          id: 'RANDOM',
+          cards: _allCards.map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value)
+        });
+      }
+      return data.categories;
+    }
+
+    // Create a single card in DOM
+    function createCategory(data, index) {
+
+      const category = document.createElement("span");
+      category.id = data.id;
+      if (data.id != 'RANDOM') {
+        category.innerHTML = `${data.name}`;
+      } else {
+        category.innerHTML = '<i class="fa fa-random"></i>';
+      }
+      if (index === 0) {
+        category.classList.add("active");
+      }
+      category.addEventListener("click", () => activateCategory(data.id));
+      categoriesContainer.appendChild(category);
+    }
+
+    createCategories();
+
+    /***
+     *  CARDS
+     */
+    function showAll() {
+      categoriesData.filter((category) => category.id == currentCategory)[0].cards.forEach((data) => showCard(data, currentCategory));
+    }
+
+    function createCards(idCategory) {
+      currentCategory = idCategory;
+      let category = categoriesData.filter((category) => category.id == idCategory)[0];
+      hiddenCountElement.innerHTML = category.hiddenCount ? category.hiddenCount : 0;
+      category.cards.forEach((card) => {
+        createCard(card, idCategory)
+      });
+    }
+
+    function findCard(idCard) {
+      let finded = undefined;
+      categoriesData.forEach((category) => {
+        category.cards.forEach((card) => {
+          if (card.id == idCard) {
+            finded = card;
+          }
+        })
+      })
+      return finded;
+    }
+
+    function tagCard(idCard) {
+      let card = findCard(idCard);
+      element = document.getElementById(idCard);
+      let elementsCard = element.getElementsByClassName('front');
+      Array.from(elementsCard).forEach((backFrontElement) => {
+        if (card.tagged) {
+          backFrontElement.classList.remove('tag');
+        } else {
+          backFrontElement.classList.add('tag');
+        }
+      });
+      elementsCard = element.getElementsByClassName('back');
+      Array.from(elementsCard).forEach((backFrontElement) => {
+        if (card.tagged) {
+          backFrontElement.classList.remove('tag');
+        } else {
+          backFrontElement.classList.add('tag');
+        }
+      });
+      card.tagged = !card.tagged;
+
+    }
+
+    function toggleHiden(idCard, idCategory) {
+
+      let card = findCard(idCard);
+      element = document.getElementById(idCard);
+      if (card.hidden) {
+        element.classList.remove('hideCard');
+      } else {
+        element.classList.add('hideCard');
+      }
+      card.hidden = !card.hidden;
+      let category = categoriesData.filter((category) => category.id == idCategory)[0];
+      if (category.hiddenCount) {
+        category.hiddenCount++;
+      } else {
+        category.hiddenCount = 1;
+      }
+      hiddenCountElement.innerHTML = category.hiddenCount;
+
+    }
+
+    function showCard(card, idCategory) {
+
+      element = document.getElementById(card.id);
+      element.classList.remove('hideCard');
+      card.hidden = false;
+      let category = categoriesData.filter((category) => category.id == idCategory)[0];
+      category.hiddenCount = 0;
+      hiddenCountElement.innerHTML = category.hiddenCount;
+
+    }
+
+    // Create a single card in DOM
+    function createCard(card, idCategory) {
+      let _tagClass = card.tagged ? 'tag' : '';
+      const cardElement = document.createElement("div");
+      cardElement.id = card.id;
+      cardElement.classList.add("card-container");
+      cardElement.classList.add("col-card");
+      if (card.hidden) {
+        cardElement.classList.add("hideCard");
+      }
+      cardElement.innerHTML = `
+        <div class="card">
+            <div class="front ${_tagClass}">
+                <div class="cover">
+                   <img src="https://www.purdue.edu/home/wp-content/themes/purdue-home-theme/imgs/PU-H-light.svg">
+                </div>
+                <div class="content">
+                    <div class="main">
+                        <h3 class="name">${card.question}</h3>
+                    </div>
+                </div>
+            </div> 
+            <div class="back  ${_tagClass}">
+                <div class="header">
+                    <img src="https://www.purdue.edu/home/wp-content/themes/purdue-home-theme/imgs/PU-H-light.svg">
+                </div>
+                <div class="content">
+                    <div class="main">
+                         <h4 class="text-center">${card.answer}</h4>
+                    </div>
+                    <div class="footer">
+                        <button class="btn" onclick="toggleHiden('${card.id}', '${idCategory}')"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i></button>
+                        <button class="btn" onclick="tagCard('${card.id}')"><i class="fa fa-tag fa-lg" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+      cardsContainer.appendChild(cardElement);
+    }
+
+    createCards(categoriesData[0].id);
+
+    /**
+     * SAVE / RESTORE
+     */
+    function save() {
+      let _data = data;
+      let objJsonStr = JSON.stringify(_data);
+      let objJsonB64 = btoa(objJsonStr);
+      let _type = 'text/plain';
+      let _filename = 'prueba';
+      let file = new Blob([objJsonB64], { type: _type });
+      if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, _filename);
+      else { // Others
+        var a = document.createElement("a"),
+          url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = _filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 0);
+      }
+    }
+    function openFile() {
+      document.getElementById('inp').click();
+    }
+    function readFile(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        data = JSON.parse(atob(e.target.result));
+        categoriesData = getCategoriesData();
+        activateCategory(categoriesData[0].id);
+        document.getElementById('inp').value = '';
+      }
+      reader.readAsText(file)
+    }
+  </script>
+</body>
+
 </html>
