@@ -5,31 +5,32 @@
  * 
  */
 let data = {
+    title: 'titulo principal',
     categories: [
         {
-            name: 'categoria 1',
-            id: 'CAT_1',
+            name: 'categoria A',
+            id: 'CAT_A',
             cards: [
                 {
-                    id: 'CAT_1_1',
+                    id: 'CAT_A_1',
                     tmstamp: '',
                     question: 'Where has you been?',
                     answer: 'Chicago'
                 },
                 {
-                    id: 'CAT_1_2',
+                    id: 'CAT_A_2',
                     tmstamp: '',
                     question: 'HOLA?',
                     answer: 'HELLO'
                 },
                 {
-                    id: 'CAT_1_2',
+                    id: 'CAT_A_3',
                     tmstamp: '',
                     question: 'ASDFSADFASDF?',
                     answer: 'DSFDSF'
                 },
                 {
-                    id: 'CAT_1_2',
+                    id: 'CAT_A_4',
                     tmstamp: '',
                     question: 'ASDFSADFASDF?',
                     answer: 'DSFDSF'
@@ -37,17 +38,17 @@ let data = {
             ]
         },
         {
-            name: 'categoria 2',
-            id: 'CAT_1',
+            name: 'categoria B',
+            id: 'CAT_B',
             cards: [
                 {
-                    id: 'CAT_1_1',
+                    id: 'CAT_B_1',
                     tmstamp: '',
                     question: 'Where has you been?',
                     answer: 'Chicago'
                 },
                 {
-                    id: 'CAT_1_2',
+                    id: 'CAT_B_2',
                     tmstamp: '',
                     question: 'dasdsWhere has you been?',
                     answer: 'Chicadsadgo'
@@ -61,25 +62,35 @@ let data = {
  */
 const cardsContainer = document.getElementById("cards-container");
 const categoriesContainer = document.getElementById("categories-container");
-// const prevBtn = document.getElementById("prev");
-// const nextBtn = document.getElementById("next");
-// const currentEl = document.getElementById("current");
-// Keep track of current card
-let currentActiveCard = 0;
-
-// Store DOM cards
-const cardsEl = [];
-
-
-// Store DOM categories
-const categoriesEl = [];
+const titleElement = document.getElementById("title");
 
 // Store card data
 const categoriesData = getCategoriesData();
-const cardsData = getCardsData();
+
+const categoriesElements = [];
+/**
+ *  TITLE
+ */
+
+function createTitle(){
+    titleElement.innerHTML = data.title;
+}
+createTitle();
+
 /**
  *  CATEGORIES
  */
+function activateCategory(id){
+    cardsContainer.innerHTML = '';
+    Array.from(categoriesContainer.children).forEach((element)=>{
+        if(element.id == id){
+            element.classList.add('active');
+        }else{
+            element.classList.remove('active');
+        }
+    });
+    createCards(id);
+}
 
 function createCategories() {
     categoriesData.forEach((data, index) => createCategory(data, index));
@@ -92,37 +103,15 @@ function getCategoriesData() {
 
 // Create a single card in DOM
 function createCategory(data, index) {
-    return;
-    const category = document.createElement("div");
-    category.classList.add("col");
-    category.classList.add("card");
 
+    const category = document.createElement("span");
+    category.id= data.id;
+    category.innerHTML = `${data.name}`;
     if (index === 0) {
         category.classList.add("active");
     }
-
-    category.innerHTML = `
-      <div class="card-body">
-      <img src="https://www.purdue.edu/home/wp-content/themes/purdue-home-theme/imgs/PU-H-light.svg">
-            <div class="card-title">
-              <p>${data.name}</p>
-            </div>
-            <div class="card-text">
-            <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            </div>
-          </div>
-        </div>
-    `;
-
-    category.addEventListener("click", () => category.classList.toggle("show-answer"));
-
-    // Add to DOM cards
-    categoriesEl.push(category);
-
+    category.addEventListener("click", () => activateCategory(data.id));
     categoriesContainer.appendChild(category);
-
 }
 
 createCategories();
@@ -131,12 +120,12 @@ createCategories();
  *  CARDS
  */
 
-function createCards() {
-    cardsData.forEach((data, index) => createCard(data, index));
+function createCards(idCategory) {
+    categoriesData.filter((category)=> category.id == idCategory)[0].cards.forEach((data, index) => createCard(data));
 }
 
 // Create a single card in DOM
-function createCard(data, index) {
+function createCard(data) {
     const card = document.createElement("div");
     card.classList.add("card-container");
     card.classList.add("col-card");
@@ -173,17 +162,4 @@ function createCard(data, index) {
     cardsContainer.appendChild(card);
 }
 
-
-// Get cards from local storage
-function getCardsData() {
-    const cards = JSON.parse(localStorage.getItem("cards"));
-    return cards === null ? data.categories[0].cards : cards;
-}
-
-// Add card to local storage
-function setCardsData(cards) {
-    localStorage.setItem("cards", JSON.stringify(cards));
-    window.location.reload();
-}
-
-createCards();
+createCards(categoriesData[0].id);
