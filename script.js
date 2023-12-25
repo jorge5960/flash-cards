@@ -68,7 +68,7 @@ const hiddenCountElement = document.getElementById("count");
 let currentCategory;
 
 // Store card data
-const categoriesData = getCategoriesData();
+let categoriesData = getCategoriesData();
 /**
  *  TITLE
  */
@@ -101,8 +101,7 @@ function createCategories() {
 }
 
 function getCategoriesData() {
-    const categories = JSON.parse(localStorage.getItem("categories"));
-    return categories === null ? data.categories : categories;
+    return data.categories;
 }
 
 // Create a single card in DOM
@@ -245,3 +244,44 @@ function createCard(card, idCategory) {
 }
 
 createCards(categoriesData[0].id);
+
+/**
+ * SAVE / RESTORE
+ */
+function save(){
+    let _data = data;
+    let objJsonStr = JSON.stringify(_data);
+    let objJsonB64 = btoa(objJsonStr);
+    let _type = 'text/plain';
+    let _filename = 'prueba';
+    let file = new Blob([objJsonB64], {type: _type});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, _filename);
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = _filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+}
+function openFile() {
+    document.getElementById('inp').click();
+  }
+  function readFile(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      data = JSON.parse(atob(e.target.result));
+      categoriesData = getCategoriesData();
+      activateCategory(categoriesData[0].id);
+      document.getElementById('inp').value = '';
+    }
+    reader.readAsText(file)
+  }
